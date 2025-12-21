@@ -4,7 +4,7 @@
 # Script de vérification de la syntaxe SQL des migrations
 # Vérifie la syntaxe MySQL et détecte les patterns problématiques
 
-# Note: Ne pas utiliser set -e car les tests de conditions peuvent échouer
+# Note: Do not use set -e as condition tests may fail
 # set -e
 
 # Couleurs pour l'output
