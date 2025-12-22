@@ -1,2 +1,2 @@
 -- Triggers placeholder
--- Aucun trigger défini pour l'instant
+-- Aucun déclencheur défini pour l'instant
