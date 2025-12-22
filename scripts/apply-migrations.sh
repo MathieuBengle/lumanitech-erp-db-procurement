@@ -100,17 +100,22 @@ build_mysql_cmd() {
   fi
 
   MYSQL_CMD=(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER")
-  if [ -n "$DB_PASSWORD" ]; then
-    MYSQL_CMD+=("-p$DB_PASSWORD")
-  fi
 }
 
 mysql_exec() {
-  "${MYSQL_CMD[@]}" "$@"
+  if [ -n "$DB_PASSWORD" ] && [ -z "$LOGIN_PATH" ]; then
+    MYSQL_PWD="$DB_PASSWORD" "${MYSQL_CMD[@]}" "$@"
+  else
+    "${MYSQL_CMD[@]}" "$@"
+  fi
 }
 
 mysql_exec_db() {
-  "${MYSQL_CMD[@]}" "$DB_NAME" "$@"
+  if [ -n "$DB_PASSWORD" ] && [ -z "$LOGIN_PATH" ]; then
+    MYSQL_PWD="$DB_PASSWORD" "${MYSQL_CMD[@]}" "$DB_NAME" "$@"
+  else
+    "${MYSQL_CMD[@]}" "$DB_NAME" "$@"
+  fi
 }
 
 while [[ $# -gt 0 ]]; do
