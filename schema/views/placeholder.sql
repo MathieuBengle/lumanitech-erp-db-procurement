@@ -1,2 +1,2 @@
 -- Views placeholder
--- Aucun vue définie pour l'instant
+-- Aucune vue définie pour l'instant
