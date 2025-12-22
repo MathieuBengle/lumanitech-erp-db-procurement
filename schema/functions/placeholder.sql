@@ -1,0 +1,2 @@
+-- Functions placeholder
+-- Aucune fonction définie pour l'instant

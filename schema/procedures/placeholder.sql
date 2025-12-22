@@ -1,0 +1,2 @@
+-- Procedures placeholder
+-- Aucune procédure stockée implémentée dans cette version initiale

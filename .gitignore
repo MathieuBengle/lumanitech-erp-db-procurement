@@ -1,0 +1,38 @@
+# Database dumps and backups
+*.sql.gz
+*.sql.zip
+*.dump
+backup/
+dumps/
+
+# Database connection files with credentials
+.env
+.env.local
+.env.*.local
+config/database.yml
+database.ini
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.log
+
+# OS files
+Thumbs.db
+Desktop.ini
+
+# Test databases
+test_*.sql
+
+# Migration rollback files (forward-only strategy)
+*_rollback.sql
+*_down.sql
