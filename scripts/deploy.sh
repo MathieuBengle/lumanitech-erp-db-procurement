@@ -81,9 +81,9 @@ build_mysql_cmd() {
     return
   fi
 
-  prompt_password
-  MYSQL_CMD=(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER")
-  MYSQL_CMD+=("-p$DB_PASSWORD")
+  # Fallback: rely on mysql's own interactive password prompt to avoid exposing
+  # the password via command-line arguments.
+  MYSQL_CMD=(mysql -h "$DB_HOST" -P "$DB_PORT" -u "$DB_USER" -p)
 }
 
 mysql_exec() {
