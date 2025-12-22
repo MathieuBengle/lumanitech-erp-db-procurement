@@ -182,12 +182,23 @@ Ce repository de base de données est **possédé et maintenu par l'équipe API 
 git clone https://github.com/MathieuBengle/lumanitech-erp-db-procurement.git
 cd lumanitech-erp-db-procurement
 
-# 2. Créer la base de données
+# 2. Créer la base de données (privilèges root ou DBA requis)
 mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS procurement CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
 
-# 3. Appliquer les migrations
-./scripts/apply-migrations.sh
+# 3. Rendre les scripts exécutables
+chmod +x ./scripts/deploy.sh ./scripts/apply-migrations.sh
+
+# 4. Stocker les identifiants via mysql_config_editor (script utilise l'utilisateur admin)
+mysql_config_editor set --login-path=local \
+    --host=localhost \
+    --user=admin \
+    --password
+
+# 5. Déployer schéma, migrations et données d'exemple
+./scripts/deploy.sh --login-path=local --with-seeds
 ```
+
+La commande `deploy.sh` orchestre la création des objets (`schema/tables`, `schema/views`, `procedures`, `functions`, `triggers`), l'exécution de toutes les migrations versionnées et, si l'option `--with-seeds` est fournie, l'injection des jeux de données `seeds/reference` et `seeds/sample`. Retirez `--with-seeds` si vous ne voulez pas recharger les données d'exemple.
 
 ### Création d'une nouvelle migration
 
@@ -230,8 +241,10 @@ done
 #### Avec le script
 
 ```bash
-./scripts/apply-migrations.sh --database procurement --user root --password
+./scripts/apply-migrations.sh --database procurement --user admin --login-path=local
 ```
+
+Le script `apply-migrations.sh` sait maintenant réutiliser la même `login-path=local` que `deploy.sh`, ce qui évite de passer les mots de passe en clair. Si vous n'utilisez pas de login path, il vous invite à saisir le mot de passe.
 
 ### Chargement des données de référence
 

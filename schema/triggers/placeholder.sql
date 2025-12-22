@@ -1,0 +1,2 @@
+-- Triggers placeholder
+-- Aucun trigger défini pour l'instant
