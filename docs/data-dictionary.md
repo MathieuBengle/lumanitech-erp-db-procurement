@@ -26,7 +26,7 @@ Ce document décrit toutes les tables, colonnes, types de données, contraintes 
 | phone | VARCHAR(50) | YES | NULL | - | Numéro de téléphone principal |
 | address | TEXT | YES | NULL | - | Adresse postale complète |
 | city | VARCHAR(100) | YES | NULL | INDEX | Ville |
-| country | VARCHAR(100) | YES | NULL | INDEX | Pays (code ISO 3166-1 alpha-3) |
+| country | VARCHAR(3) | YES | NULL | INDEX | Pays (code ISO 3166-1 alpha-3) |
 | status | ENUM | NO | 'active' | INDEX | Statut: active, inactive, blocked |
 | created_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | - | Date de création |
 | updated_at | TIMESTAMP | NO | CURRENT_TIMESTAMP | - | Date de dernière modification |
