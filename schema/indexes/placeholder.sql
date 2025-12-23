@@ -1,0 +1,3 @@
+-- Placeholder for standalone indexes
+-- This file exists to ensure the indexes directory is tracked by Git
+-- Remove this file when adding actual index definitions

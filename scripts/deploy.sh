@@ -16,7 +16,7 @@ DB_NAME="lumanitech_erp_procurement"
 DB_USER="admin"
 LOGIN_PATH="local"
 WITH_SEEDS=false
-SEED_DIRS=("$PROJECT_ROOT/seeds/reference" "$PROJECT_ROOT/seeds/sample")
+SEED_DIRS=("$PROJECT_ROOT/seeds/dev")
 
 MYSQL_CMD=()
 
@@ -201,6 +201,7 @@ run_sql_dir "views" "$SCHEMA_DIR/views"
 run_sql_dir "procedures" "$SCHEMA_DIR/procedures"
 run_sql_dir "functions" "$SCHEMA_DIR/functions"
 run_sql_dir "triggers" "$SCHEMA_DIR/triggers"
+run_sql_dir "indexes" "$SCHEMA_DIR/indexes"
 apply_migrations
 load_seeds
 success "Déploiement $DB_NAME DB terminé"

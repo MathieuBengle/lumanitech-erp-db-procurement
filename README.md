@@ -1,349 +1,411 @@
 # Lumanitech ERP - Procurement Database
 
-Base de données pour le module d'approvisionnement du système ERP Lumanitech.
+Database schema and migrations for the Procurement module of the Lumanitech ERP system.
 
-## 📋 Table des matières
+## 📋 Table of Contents
 
-- [Vue d'ensemble](#vue-densemble)
-- [Structure du repository](#structure-du-repository)
-- [Stratégie de migration](#stratégie-de-migration)
-- [Ownership et responsabilité](#ownership-et-responsabilité)
-- [Guide d'utilisation](#guide-dutilisation)
-- [Validation CI/CD](#validation-cicd)
-- [Contribution](#contribution)
+- [Overview](#overview)
+- [Repository Structure](#repository-structure)
+- [Migration Strategy](#migration-strategy)
+- [Getting Started](#getting-started)
+- [Usage](#usage)
+- [Development](#development)
+- [Related Repositories](#related-repositories)
 
-## 🎯 Vue d'ensemble
+## 🎯 Overview
 
-Ce repository contient **uniquement** les définitions de schéma, migrations, et données de référence pour le module Procurement. Il ne contient **aucun code applicatif**.
+This repository contains **only** the database schema definitions, migrations, and reference data for the Procurement module. It does **not** contain application code.
 
-### Périmètre fonctionnel
+### Functional Scope
 
-Le module Procurement gère :
-- Gestion des fournisseurs (suppliers)
-- Demandes d'achat (purchase requests)
-- Bons de commande (purchase orders)
-- Réceptions de marchandises (goods receipts)
-- Factures fournisseurs (vendor invoices)
-- Contrats et accords-cadres (contracts & agreements)
+The Procurement module manages:
+- **Suppliers**: Vendor master data and contact information
+- **Purchase Requests**: Internal requests for goods/services
+- **Purchase Orders**: Orders sent to suppliers
+- **Goods Receipts**: Receipt of ordered items
+- **Vendor Invoices**: Invoices received from suppliers
+- **Contracts & Agreements**: Long-term supplier agreements
 
-## 📁 Structure du repository
+### Technology
+
+- **Database**: MySQL 8.0+
+- **Character Set**: UTF-8 (utf8mb4)
+- **Storage Engine**: InnoDB
+- **Host**: WHC (Web Hosting Canada)
+
+## 📁 Repository Structure
 
 ```
 lumanitech-erp-db-procurement/
-├── migrations/          # Scripts de migration versionnés (forward-only)
-│   ├── README.md       # Guide des migrations
-│   └── VXXX_*.sql     # Fichiers de migration (ex: V001_init_schema.sql)
-├── schema/             # Définition du schéma actuel
-│   ├── README.md      # Documentation du schéma
-│   ├── tables/        # Définitions des tables
-│   ├── views/         # Vues SQL
-│   ├── procedures/    # Procédures stockées
-│   ├── functions/     # Fonctions SQL
-│   └── triggers/      # Triggers
-├── seeds/              # Données de référence et exemples
-│   ├── README.md      # Guide des seeds
-│   ├── reference/     # Données de référence (pays, devises, etc.)
-│   └── sample/        # Données d'exemple pour dev/test
-├── docs/               # Documentation
-│   ├── schema-design.md    # Design du schéma
-│   ├── data-dictionary.md  # Dictionnaire de données
-│   └── migration-guide.md  # Guide de migration détaillé
-├── scripts/            # Scripts d'automatisation et validation
-│   ├── validate-migrations.sh  # Validation des migrations
-│   ├── check-syntax.sh        # Vérification syntaxe SQL
-│   └── apply-migrations.sh    # Application des migrations
-└── README.md           # Ce fichier
+├── CONTRIBUTING.md              # Contribution guidelines
+├── README.md                    # This file
+├── migrations/                  # Versioned migration scripts
+│   ├── TEMPLATE.sql            # Migration template
+│   ├── README.md               # Migration guide
+│   └── V###_*.sql             # Migration files (e.g., V001_init_schema.sql)
+├── schema/                      # Current schema definition
+│   ├── README.md               # Schema organization guide
+│   ├── tables/                 # Table definitions
+│   ├── views/                  # SQL views
+│   ├── procedures/             # Stored procedures
+│   ├── functions/              # SQL functions
+│   ├── triggers/               # Database triggers
+│   └── indexes/                # Standalone index definitions
+├── seeds/                       # Seed data for development
+│   ├── README.md               # Seed data guide
+│   └── dev/                    # Development seed data
+│       ├── countries.sql       # ISO country codes
+│       ├── currencies.sql      # ISO currency codes
+│       ├── order_statuses.sql  # Order status reference data
+│       └── sample_suppliers.sql # Sample supplier data
+├── scripts/                     # Automation and deployment scripts
+│   ├── README.md               # Script documentation
+│   ├── deploy.sh               # Main deployment script
+│   ├── apply-migrations.sh     # Migration application script
+│   ├── validate.sh             # Validation wrapper script
+│   ├── validate-migrations.sh  # Migration validation
+│   └── check-syntax.sh         # SQL syntax checker
+└── docs/                        # Documentation
+    ├── migration-strategy.md   # Migration strategy guide
+    ├── schema.md               # Schema documentation
+    ├── schema-design.md        # Design decisions (legacy)
+    ├── data-dictionary.md      # Data dictionary (legacy)
+    └── migration-guide.md      # Detailed migration guide (legacy)
 ```
 
-## 🔄 Stratégie de migration
+## 🔄 Migration Strategy
 
-### Principe : Forward-Only
+### Forward-Only Migrations
 
-Ce repository utilise une **stratégie de migration forward-only** (unidirectionnelle) :
+This repository uses a **forward-only migration strategy**:
 
-✅ **Autorisé :**
-- Migrations qui ajoutent de nouvelles structures (tables, colonnes, indexes)
-- Migrations qui modifient des données
-- Migrations qui créent de nouvelles contraintes
+✅ **Allowed:**
+- Migrations that add new structures (tables, columns, indexes)
+- Migrations that modify data
+- Migrations that create new constraints
 
-❌ **Interdit :**
-- Fichiers de rollback (`*_down.sql`, `*_rollback.sql`)
-- Suppression de colonnes sans migration de correction
-- Modifications destructives sans plan de récupération
+❌ **Forbidden:**
+- Rollback files (`*_down.sql`, `*_rollback.sql`)
+- Deleting columns without a corrective migration
+- Destructive modifications without a recovery plan
 
-### Convention de nommage
+### Naming Convention
 
-Les migrations suivent le format : `VXXX_description.sql`
+Migrations follow the format: `V###_description.sql`
 
-Où :
-- `V` : Préfixe obligatoire pour "Version"
-- `XXX` : Numéro séquentiel à 3 chiffres (001, 002, 003, ...)
-- `description` : Description courte en snake_case (anglais recommandé)
+Where:
+- `V` = Version prefix (required)
+- `###` = Three-digit sequential number (001, 002, 003, ...)
+- `description` = Brief description in snake_case (English)
 
-**Exemples :**
+**Examples:**
 ```
 V001_init_schema.sql
 V002_add_suppliers_table.sql
 V003_add_purchase_orders_table.sql
 V004_add_audit_columns.sql
-V005_create_reporting_views.sql
 ```
 
-### Règles importantes
+### Key Rules
 
-1. **Séquentialité** : Les migrations sont appliquées dans l'ordre numérique
-2. **Immutabilité** : Une fois mergée en `main`, une migration ne doit JAMAIS être modifiée
-3. **Correction par ajout** : Pour corriger une erreur, créer une nouvelle migration
-4. **Idempotence** : Utiliser `IF NOT EXISTS` et `IF EXISTS` quand approprié
-5. **Transactions** : Chaque migration doit être transactionnelle quand possible
+1. **Sequential**: Migrations are applied in numerical order
+2. **Immutable**: Once merged to `main`, a migration must NEVER be modified
+3. **Corrective**: To fix an error, create a new migration
+4. **Idempotent**: Use `IF NOT EXISTS` and `IF EXISTS` when appropriate
+5. **Transactional**: Each migration should be wrapped in a transaction
+6. **Self-Tracking**: Every migration inserts into `schema_migrations` table
 
-### Template de migration
+### Migration Template
 
 ```sql
--- Migration: VXXX_description
+-- Migration: V###_description
 -- Created: YYYY-MM-DD
--- Author: Nom de l'auteur
--- Description: Description détaillée de la migration
+-- Author: Your Name
+-- Description: Detailed description of the migration
 
--- Start transaction (if supported for DDL)
 START TRANSACTION;
 
 -- Your migration code here
--- Use IF NOT EXISTS for safety
-CREATE TABLE IF NOT EXISTS example (
+CREATE TABLE IF NOT EXISTS example_table (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- Commit transaction
+-- Record migration
+INSERT INTO schema_migrations (version, description) 
+VALUES ('V###', 'description')
+ON DUPLICATE KEY UPDATE applied_at = CURRENT_TIMESTAMP;
+
 COMMIT;
 ```
 
-## 👥 Ownership et responsabilité
+## 🚀 Getting Started
 
-### Propriété du schéma
+### Prerequisites
 
-Ce repository de base de données est **possédé et maintenu par l'équipe API Backend**.
-
-### Modèle de responsabilité
-
-```
-┌─────────────────────────────────────┐
-│   Procurement API (Owner)          │
-│   - Définit les besoins métier     │
-│   - Propose les évolutions schema  │
-│   - Consomme la base de données    │
-└─────────────────────────────────────┘
-              │
-              ▼
-┌─────────────────────────────────────┐
-│   DB Repository (Ce repo)           │
-│   - Stocke les migrations SQL      │
-│   - Documente le schéma            │
-│   - Valide la cohérence            │
-└─────────────────────────────────────┘
-              │
-              ▼
-┌─────────────────────────────────────┐
-│   MySQL Database Server             │
-│   - Exécute les migrations         │
-│   - Héberge les données            │
-└─────────────────────────────────────┘
-```
-
-### Workflow de modification
-
-1. **Proposition** : L'équipe API propose une modification via PR
-2. **Review** : Review par les pairs (DB team + API team)
-3. **Validation** : CI valide la syntaxe et la séquence
-4. **Merge** : Fusion dans `main` après approbation
-5. **Déploiement** : Application automatique ou manuelle selon l'environnement
-
-### Points de contact
-
-- **Owner** : Procurement API Team
-- **DBA Support** : Database Administration Team
-- **Questions** : Créer une issue dans ce repository
-
-## 📖 Guide d'utilisation
-
-### Prérequis
-
-- MySQL 8.0+
-- Client MySQL (mysql-client, MySQL Workbench, DBeaver, etc.)
+- MySQL 8.0+ client
 - Git
+- Local MySQL server (for development)
 
-### Installation locale
+### Installation
+
+1. **Clone the repository:**
 
 ```bash
-# 1. Cloner le repository
 git clone https://github.com/MathieuBengle/lumanitech-erp-db-procurement.git
 cd lumanitech-erp-db-procurement
+```
 
-# 2. Créer la base de données (privilèges root ou DBA requis)
-mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS procurement CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+2. **Create the database:**
 
-# 3. Rendre les scripts exécutables
-chmod +x ./scripts/deploy.sh ./scripts/apply-migrations.sh
+```bash
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS lumanitech_erp_procurement CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
 
-# 4. Stocker les identifiants via mysql_config_editor (script utilise l'utilisateur admin)
+3. **Set up credentials (recommended):**
+
+```bash
 mysql_config_editor set --login-path=local \
     --host=localhost \
     --user=admin \
     --password
+```
 
-# 5. Déployer schéma, migrations et données d'exemple
+4. **Deploy schema and migrations:**
+
+```bash
+# Make scripts executable
+chmod +x scripts/*.sh
+
+# Deploy everything with seed data
 ./scripts/deploy.sh --login-path=local --with-seeds
 ```
 
-La commande `deploy.sh` orchestre la création des objets (`schema/tables`, `schema/views`, `procedures`, `functions`, `triggers`), l'exécution de toutes les migrations versionnées et, si l'option `--with-seeds` est fournie, l'injection des jeux de données `seeds/reference` et `seeds/sample`. Retirez `--with-seeds` si vous ne voulez pas recharger les données d'exemple.
-
-### Création d'une nouvelle migration
+### Verification
 
 ```bash
-# 1. Créer le fichier de migration avec le prochain numéro
-cd migrations
-# Vérifier le dernier numéro utilisé
-ls -1 V*.sql | tail -1
-# Créer la nouvelle migration
-touch V00X_your_description.sql
+# Check applied migrations
+mysql --login-path=local lumanitech_erp_procurement -e "SELECT * FROM schema_migrations ORDER BY version;"
 
-# 2. Éditer le fichier avec votre SQL
-# Suivre le template de migration
+# Check tables
+mysql --login-path=local lumanitech_erp_procurement -e "SHOW TABLES;"
 
-# 3. Tester localement
-mysql -u root -p procurement < V00X_your_description.sql
-
-# 4. Valider
-../scripts/validate-migrations.sh
-
-# 5. Créer une PR
-git checkout -b feat/add-migration-X
-git add V00X_your_description.sql
-git commit -m "feat: add migration X for [description]"
-git push origin feat/add-migration-X
+# Check suppliers table
+mysql --login-path=local lumanitech_erp_procurement -e "DESCRIBE suppliers;"
 ```
 
-### Application des migrations
+## 📖 Usage
 
-#### Manuellement
+### Deploying to an Environment
 
+**Development (with seeds):**
 ```bash
-# Appliquer toutes les migrations
-for file in migrations/V*.sql; do
-    echo "Applying $file..."
-    mysql -u root -p procurement < "$file"
-done
+./scripts/deploy.sh --login-path=local --with-seeds
 ```
 
-#### Avec le script
-
+**Staging (without seeds):**
 ```bash
-./scripts/apply-migrations.sh --database procurement --user admin --login-path=local
+./scripts/deploy.sh \
+    --host=staging-db.example.com \
+    --database=lumanitech_erp_procurement \
+    --user=deploy_user
 ```
 
-Le script `apply-migrations.sh` sait maintenant réutiliser la même `login-path=local` que `deploy.sh`, ce qui évite de passer les mots de passe en clair. Si vous n'utilisez pas de login path, il vous invite à saisir le mot de passe.
-
-### Chargement des données de référence
-
+**Production (no seeds!):**
 ```bash
-# Charger les données de référence
-mysql -u root -p procurement < seeds/reference/countries.sql
-mysql -u root -p procurement < seeds/reference/currencies.sql
-
-# Charger les données d'exemple (dev/test uniquement)
-mysql -u root -p procurement < seeds/sample/sample_suppliers.sql
+./scripts/deploy.sh \
+    --host=prod-db.example.com \
+    --database=lumanitech_erp_procurement \
+    --user=deploy_user
 ```
 
-## ✅ Validation CI/CD
-
-### Scripts de validation
-
-Ce repository inclut plusieurs scripts de validation exécutés automatiquement en CI :
-
-#### 1. Validation des migrations (`validate-migrations.sh`)
-
-Vérifie :
-- ✅ Nomenclature correcte (`VXXX_*.sql`)
-- ✅ Séquence numérique sans trou
-- ✅ Pas de doublons
-- ✅ Pas de fichiers de rollback
+### Running Migrations Only
 
 ```bash
+./scripts/apply-migrations.sh \
+    --login-path=local \
+    --database=lumanitech_erp_procurement
+```
+
+### Loading Seed Data
+
+```bash
+# All seed data from seeds/dev/
+./scripts/deploy.sh --login-path=local --with-seeds
+
+# Or manually
+mysql --login-path=local lumanitech_erp_procurement < seeds/dev/countries.sql
+mysql --login-path=local lumanitech_erp_procurement < seeds/dev/currencies.sql
+mysql --login-path=local lumanitech_erp_procurement < seeds/dev/sample_suppliers.sql
+```
+
+### Validation
+
+```bash
+# Run all validation checks
+./scripts/validate.sh
+
+# Validate migrations only
 ./scripts/validate-migrations.sh
-```
 
-#### 2. Validation de syntaxe SQL (`check-syntax.sh`)
-
-Vérifie :
-- ✅ Syntaxe SQL valide (via mysqlcheck ou parser SQL)
-- ✅ Pas d'instructions dangereuses en production
-- ✅ Respect des conventions de nommage
-
-```bash
+# Check SQL syntax
 ./scripts/check-syntax.sh
 ```
 
-### Pipeline CI
+## 💻 Development
 
-Le pipeline CI exécute automatiquement :
+### Creating a New Migration
 
-```yaml
-# Exemple de pipeline (.github/workflows/validate.yml)
-- Checkout code
-- Install MySQL client
-- Run validate-migrations.sh
-- Run check-syntax.sh
-- Dry-run migrations sur DB de test
-```
-
-### Pré-commit hooks (recommandé)
+1. **Determine the next version number:**
 
 ```bash
-# Installer les hooks locaux
-cp scripts/pre-commit.sh .git/hooks/pre-commit
-chmod +x .git/hooks/pre-commit
+cd migrations
+ls -1 V*.sql | tail -1
+# Output: V001_init_schema.sql
+# Next number: V002
 ```
 
-## 🤝 Contribution
+2. **Create the migration file:**
 
-### Règles de contribution
+```bash
+touch V002_add_purchase_orders.sql
+```
 
-1. **Toujours créer une branche** depuis `main`
-2. **Nom de branche** : `feat/migration-XXX-description` ou `fix/migration-XXX-description`
-3. **Une migration par PR** (sauf migrations fortement liées)
-4. **Description claire** du besoin métier
-5. **Tests locaux** avant de pousser
-6. **Review obligatoire** par au moins 1 pair
+3. **Edit using TEMPLATE.sql as a guide:**
 
-### Checklist PR
+```bash
+# Copy template structure
+cp TEMPLATE.sql V002_add_purchase_orders.sql
+# Edit the file with your changes
+```
 
-- [ ] Migration testée localement
-- [ ] Nomenclature respectée (`VXXX_*.sql`)
-- [ ] Numéro séquentiel correct
-- [ ] Scripts de validation passent
-- [ ] Documentation mise à jour si nécessaire
-- [ ] Description claire du changement
+4. **Test locally:**
 
-### Types de commits
+```bash
+# Backup first
+mysqldump --login-path=local lumanitech_erp_procurement > backup.sql
 
-- `feat`: Nouvelle migration (nouvelle fonctionnalité)
-- `fix`: Migration corrective
-- `docs`: Mise à jour documentation
-- `chore`: Maintenance, scripts
+# Apply migration
+mysql --login-path=local lumanitech_erp_procurement < V002_add_purchase_orders.sql
 
-## 📚 Documentation additionnelle
+# Verify
+mysql --login-path=local lumanitech_erp_procurement -e "SELECT * FROM schema_migrations WHERE version='V002';"
+```
 
-- [Design du schéma](docs/schema-design.md)
-- [Dictionnaire de données](docs/data-dictionary.md)
-- [Guide de migration détaillé](docs/migration-guide.md)
+5. **Validate:**
 
-## 📄 Licence
+```bash
+cd ..
+./scripts/validate.sh
+```
 
-Propriétaire - Lumanitech © 2024
+6. **Create a Pull Request:**
+
+```bash
+git checkout -b feat/migration-002-purchase-orders
+git add migrations/V002_add_purchase_orders.sql
+git commit -m "feat: add purchase orders table migration"
+git push origin feat/migration-002-purchase-orders
+```
+
+### Contribution Guidelines
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for detailed guidelines on:
+- Development workflow
+- Migration best practices
+- Pull request process
+- Code standards
+- Testing requirements
+
+## 🔗 Related Repositories
+
+### API Repository
+
+This database is owned and consumed by:
+- **Repository**: [lumanitech-erp-api-procurement](https://github.com/MathieuBengle/lumanitech-erp-api-procurement)
+- **Responsibility**: Procurement API implements business logic and exposes endpoints
+
+### Important Notes
+
+- This database is **NOT** accessed directly by UIs
+- This database is **NOT** shared with other ERP modules
+- All access goes through the Procurement API
+- Cross-domain data access happens via API Gateway
+
+## 📚 Documentation
+
+- [Migration Strategy](./docs/migration-strategy.md) - Detailed migration approach
+- [Schema Documentation](./docs/schema.md) - Database schema reference
+- [Scripts Guide](./scripts/README.md) - Script usage and examples
+- [Seeds Guide](./seeds/README.md) - Seed data management
+- [Contributing Guide](./CONTRIBUTING.md) - How to contribute
+
+## 🛡️ Ownership and Responsibility
+
+### Database Owner
+
+- **Team**: Procurement API Team
+- **Responsibility**: Define business needs, propose schema changes, consume the database
+
+### Workflow
+
+```
+┌─────────────────────────────────────┐
+│   Procurement API                   │
+│   - Defines business requirements   │
+│   - Proposes schema changes         │
+│   - Consumes database               │
+└─────────────────────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│   DB Repository (this repo)         │
+│   - Stores SQL migrations          │
+│   - Documents schema               │
+│   - Validates consistency          │
+└─────────────────────────────────────┘
+               │
+               ▼
+┌─────────────────────────────────────┐
+│   MySQL Database Server             │
+│   - Executes migrations            │
+│   - Hosts data                     │
+└─────────────────────────────────────┘
+```
+
+## ✅ Validation and CI/CD
+
+### Pre-Commit Validation
+
+Before committing:
+```bash
+./scripts/validate.sh
+```
+
+### CI Pipeline
+
+The CI pipeline automatically:
+1. Validates migration naming and sequence
+2. Checks SQL syntax
+3. Verifies best practices
+4. Dry-runs migrations on test database
+
+### Local Testing
+
+```bash
+# Full deployment test
+./scripts/deploy.sh --login-path=local --with-seeds
+
+# Validation only
+./scripts/validate.sh
+```
+
+## 📄 License
+
+Proprietary - Lumanitech © 2024
 
 ---
 
-**Note** : Ce repository contient uniquement du SQL. Pour le code applicatif, voir le repository de l'API Procurement.
+**Note**: This repository contains only SQL. For application code, see the [Procurement API repository](https://github.com/MathieuBengle/lumanitech-erp-api-procurement).
