@@ -1,6 +1,6 @@
 -- Seed: currencies
 -- Type: reference
--- Description: Liste des devises avec codes ISO 4217
+-- Description: Currency list with ISO 4217 codes
 -- Dependencies: None
 -- Created: 2024-12-21
 -- Author: Procurement Team
@@ -10,7 +10,7 @@ SET CHARACTER SET utf8mb4;
 
 START TRANSACTION;
 
--- Insertion des principales devises
+-- Insert main currencies
 INSERT IGNORE INTO currencies (code, name, symbol, decimal_places) VALUES
 ('EUR', 'Euro', '€', 2),
 ('USD', 'US Dollar', '$', 2),

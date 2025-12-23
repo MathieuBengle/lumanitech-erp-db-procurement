@@ -1,6 +1,6 @@
 -- Seed: countries
 -- Type: reference
--- Description: Liste des pays avec codes ISO 3166-1
+-- Description: Country list with ISO 3166-1 codes
 -- Dependencies: None
 -- Created: 2024-12-21
 -- Author: Procurement Team
@@ -10,7 +10,7 @@ SET CHARACTER SET utf8mb4;
 
 START TRANSACTION;
 
--- Insertion des pays principaux
+-- Insert main countries
 INSERT IGNORE INTO countries (code, name, name_fr, alpha2, region, subregion) VALUES
 -- Europe
 ('FRA', 'France', 'France', 'FR', 'Europe', 'Western Europe'),

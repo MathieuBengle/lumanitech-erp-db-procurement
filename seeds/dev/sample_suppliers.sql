@@ -1,6 +1,6 @@
 -- Seed: sample_suppliers
 -- Type: sample
--- Description: Fournisseurs fictifs pour développement et tests
+-- Description: Fictitious suppliers for development and testing
 -- Dependencies: suppliers table, countries
 -- Created: 2024-12-21
 -- Author: Procurement Team
@@ -11,7 +11,7 @@ SET CHARACTER SET utf8mb4;
 
 START TRANSACTION;
 
--- Insertion de fournisseurs fictifs
+-- Insert fictitious suppliers
 INSERT IGNORE INTO suppliers (id, code, name, email, phone, address, city, country, status) VALUES
 (1, 'SUP-001', 'Acme Corporation', 'contact@acme-corp.example.com', '+33 1 23 45 67 89', '123 Business Avenue', 'Paris', 'FRA', 'active'),
 (2, 'SUP-002', 'Global Supplies Ltd', 'info@globalsupplies.example.com', '+44 20 1234 5678', '456 Commerce Street', 'London', 'GBR', 'active'),
