@@ -1,6 +1,6 @@
 -- Seed: order_statuses
 -- Type: reference
--- Description: Statuts des bons de commande
+-- Description: Purchase order statuses
 -- Dependencies: None
 -- Created: 2024-12-21
 -- Author: Procurement Team
@@ -10,7 +10,7 @@ SET CHARACTER SET utf8mb4;
 
 START TRANSACTION;
 
--- Insertion des statuts de commande
+-- Insert order statuses
 INSERT IGNORE INTO order_statuses (code, label, label_fr, description, sort_order, is_active, color) VALUES
 ('draft', 'Draft', 'Brouillon', 'Order is being created', 1, TRUE, '#6c757d'),
 ('submitted', 'Submitted', 'Soumise', 'Order submitted for approval', 2, TRUE, '#0dcaf0'),

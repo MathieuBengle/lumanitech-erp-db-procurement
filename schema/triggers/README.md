@@ -4,7 +4,7 @@ Ce dossier contient les définitions des triggers.
 
 ## Format
 
-Un fichier par trigger, nommé `trigger_name.sql`
+Un fichier par trigger, nommé `trg_<name>.sql`
 
 ## Exemple
 
