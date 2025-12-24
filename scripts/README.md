@@ -158,6 +158,10 @@ mysql_config_editor set --login-path=local \
     --password
 ```
 
+**WSL2 local note:**
+Use a login-path configured with user 'admin' (for example:
+mysql_config_editor set --login-path=local --host=localhost --user=admin --password).
+
 Then use the login path in scripts:
 
 ```bash

@@ -33,6 +33,10 @@ schema/
 └── indexes/      # Standalone index definitions
 ```
 
+**Naming conventions:**
+- procedures: `sp_<name>.sql`
+- triggers: `trg_<name>.sql`
+
 ## Core Tables
 
 ### schema_migrations

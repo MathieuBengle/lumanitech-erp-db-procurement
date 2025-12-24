@@ -4,7 +4,7 @@ Ce dossier contient les définitions des procédures stockées.
 
 ## Format
 
-Un fichier par procédure, nommé `procedure_name.sql`
+Un fichier par procédure, nommé `sp_<name>.sql`
 
 ## Exemple
 

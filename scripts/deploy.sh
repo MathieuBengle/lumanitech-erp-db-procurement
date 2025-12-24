@@ -9,6 +9,11 @@ PROJECT_ROOT="$(dirname "$SCRIPT_DIR")"
 SCHEMA_DIR="$PROJECT_ROOT/schema"
 APPLY_SCRIPT="$SCRIPT_DIR/apply-migrations.sh"
 
+# Detect if running in WSL2
+is_wsl2() {
+    grep -qi microsoft /proc/version 2>/dev/null
+}
+
 # Defaults
 DB_HOST="localhost"
 DB_PORT="3306"
@@ -184,6 +189,9 @@ while [[ $# -gt 0 ]]; do
 done
 
 info "Déploiement Procurement DB"
+if is_wsl2; then
+    echo "[INFO] WSL2 detected. Use --login-path configured with user 'admin'." >&2
+fi
 info "  Database: $DB_NAME"
 info "  Host:     $DB_HOST:$DB_PORT"
 info "  Login path: ${LOGIN_PATH:-(interactive)}"
